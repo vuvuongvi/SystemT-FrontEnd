@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
+import {ApolloProvider} from '@apollo/react-hooks';
 
 const loading = () => <div className="animated fadeIn pt-3 text-center">Loading...</div>;
 
@@ -9,6 +10,7 @@ const loading = () => <div className="animated fadeIn pt-3 text-center">Loading.
 const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout'));
 
 // Pages
+const GraphQl = React.lazy(() => import('./views/Pages/Graphql'))
 const Login = React.lazy(() => import('./views/Pages/Login'));
 const Register = React.lazy(() => import('./views/Pages/Register'));
 const Page404 = React.lazy(() => import('./views/Pages/Page404'));
@@ -21,6 +23,7 @@ class App extends Component {
       <HashRouter>
           <React.Suspense fallback={loading()}>
             <Switch>
+              <Route exact path='/graphql' name='graphQL Page' render={props => <GraphQl {...props}/>}/>
               <Route exact path="/login" name="Login Page" render={props => <Login {...props}/>} />
               <Route exact path="/register" name="Register Page" render={props => <Register {...props}/>} />
               <Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />

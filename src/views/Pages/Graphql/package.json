@@ -1,0 +1,6 @@
+{
+  "name": "Graphql",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Graphql.js"
+}
