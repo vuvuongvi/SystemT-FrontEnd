@@ -1,10 +1,34 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
-import ApolloClient from 'apollo-boost';
+import { authenSignIn } from '../Graphql/Graphql'
+import gql from 'graphql-tag';
+import { setToken } from './token';
+const SIGNUP_MUTATION = gql`
+  mutation SignupMutation($email: String!, $password: String!, $name: String!) {
+    signup(email: $email, password: $password, name: $name) {
+      token
+    }
+  }
+`
+const LOGIN_MUTATION = gql`
+  mutation LoginMutation($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+    }
+  }
+`
 
 class Login extends Component {
+  state = {
+    login: true,
+    email: '',
+    password: '',
+    name: '',
+    isLogin: true
+  }
   render() {
+    const { login, email, password, name, isLogin } = this.state
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -14,45 +38,42 @@ class Login extends Component {
                 <Card className="p-4">
                   <CardBody>
                     <Form>
-                      <h1>Login</h1>
+                      <h4 className="mv3">{isLogin ? 'Login' : 'Sign Up'}</h4>
                       <p className="text-muted">Sign In to your account</p>
-                      <InputGroup className="mb-3">
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="icon-user"></i>
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input type="text" placeholder="Username" autoComplete="username" />
-                      </InputGroup>
-                      <InputGroup className="mb-4">
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="icon-lock"></i>
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input type="password" placeholder="Password" autoComplete="current-password" />
-                      </InputGroup>
-                      <Row>
-                        <Col xs="6">
-                          <Button color="primary" className="px-4">Login</Button>
-                        </Col>
-                        <Col xs="6" className="text-right">
-                          <Button color="link" className="px-0">Forgot password?</Button>
-                        </Col>
-                      </Row>
+                      <div className="flex flex-column">
+                        {!login && (
+                          <input
+                            value={name}
+                            onChange={e => this.setState({ name: e.target.value })}
+                            type="text"
+                            placeholder="Your name"
+                          />
+                        )}
+                        <input
+                          value={email}
+                          onChange={e => this.setState({ email: e.target.value })}
+                          type="text"
+                          placeholder="Your email address"
+                        />
+                        <input
+                          value={password}
+                          onChange={e => this.setState({ password: e.target.value })}
+                          type="password"
+                          placeholder="Choose a safe password"
+                        />
+                      </div>
+                      <div className="flex mt3">
+                        <button type="button" class="btn btn-primary" onClick={this._confirm}>
+                          {login ? 'login' : 'create account'}
+                        </button>
+                        <button type="button" onClick={() => this.setState({ login: !login })} class="pointer button"><span class="cil-contrast btn-icon mr-2"></span>
+                          {login
+                            ? 'Need to create account?'
+                            : 'already have an account'
+                          }
+                        </button>
+                      </div>
                     </Form>
-                  </CardBody>
-                </Card>
-                <Card className="text-white bg-primary py-5 d-md-down-none" style={{ width: '44%' }}>
-                  <CardBody className="text-center">
-                    <div>
-                      <h2>Sign up</h2>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua.</p>
-                      <Link to="/register">
-                        <Button color="primary" className="mt-3" active tabIndex={-1}>Register Now!</Button>
-                      </Link>
-                    </div>
                   </CardBody>
                 </Card>
               </CardGroup>
@@ -60,7 +81,13 @@ class Login extends Component {
           </Row>
         </Container>
       </div>
-    );
+    )
+  }
+  _confirm = async () => {
+    authenSignIn()
+  }
+  _saveUserData = token => {
+    setToken(token)
   }
 }
 
