@@ -4,20 +4,8 @@ import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGr
 import { authenSignIn } from '../Graphql/Graphql'
 import gql from 'graphql-tag';
 import { setToken } from './token';
-const SIGNUP_MUTATION = gql`
-  mutation SignupMutation($email: String!, $password: String!, $name: String!) {
-    signup(email: $email, password: $password, name: $name) {
-      token
-    }
-  }
-`
-const LOGIN_MUTATION = gql`
-  mutation LoginMutation($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      token
-    }
-  }
-`
+import {Redirect} from 'react-router-dom'
+
 
 class Login extends Component {
   state = {
@@ -84,7 +72,13 @@ class Login extends Component {
     )
   }
   _confirm = async () => {
-    authenSignIn()
+    let authen = authenSignIn(this.state.email, this.state.password)
+      .catch((error) => {
+        throw new Error(error);
+      })
+    if(authen) {
+      window.location.href = '/dashboard'
+    } 
   }
   _saveUserData = token => {
     setToken(token)

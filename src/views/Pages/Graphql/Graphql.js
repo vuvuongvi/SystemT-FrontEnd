@@ -3,33 +3,27 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
-import {gql} from 'apollo-boost';
+import { gql } from 'apollo-boost';
 const client = new ApolloClient({
-  uri: 'https://48p1r2roz4.sse.codesandbox.io',
+  uri: 'http://localhost:3002/graphql',
 });
-export const authenSignIn = () => {
-  console.log('hihi');
-  client.query({
-    query: gql`
-      {
-        rates(currency: "USD") {
-          currency
-        }
-      }
-    `
-  }).then(result => console.log(result));
-}
-
-class Graphql extends Component {
-  render() {
-    return (
-      <ApolloProvider client={client}>
-    <div>
-      <h2>My first Apollo app 🚀</h2>
-    </div>
-  </ApolloProvider>
-    );
+let loginQuery = gql`
+  query login($name: String!, $password: String!) {
+   login(name: $name, password: $password) {
+     token
+   }
   }
+`
+export const authenSignIn = async (name, password) => {
+  client.query({
+    query: loginQuery,
+    variables: {
+      name: name,
+      password: password
+    }
+  }).then(result => {
+    if (result) {
+      localStorage.setItem('sys_access', result.data.login.token);
+    }
+  });
 }
-
-export default Graphql;
